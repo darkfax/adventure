@@ -387,20 +387,20 @@ export const SCENES = {
     objects: [
       {
         id: 'letto', emoji: '🛏️', label: 'Letto di Marco',
-        x: 8, y: 58, size: 44,
+        x: 20, y: 74, size: 44,
         look: 'Il letto sfatto di Marco. Sul cuscino c\'è una statuetta di Zak McKracken, l\'unico eroe in cui crede.',
         pick: null, use: null, open: null,
       },
       {
         id: 'scrivania', emoji: '🖥️', label: 'Scrivania',
-        x: 60, y: 55, size: 42,
+        x: 57, y: 60, size: 42,
         look: 'La scrivania sommersa di articoli non pubblicati. In cima alla pila: '
             + '"ALIENI IN PIZZERIA? — La mia ricerca esclusiva". Sembrava pazzesco. Ora meno.',
         pick: null, use: null, open: null,
       },
       {
         id: 'giornale', emoji: '📰', label: 'Gazzettino Cosmico',
-        x: 70, y: 68, size: 26,
+        x: 70, y: 60, size: 26,
         look: 'Il giornale di stamattina. La sua storia di prima pagina: "STRANE LUCI A PORTO COSMO."',
         pick:  { item: 'giornale', msg: 'Marco raccoglie il giornale. "Forse questa volta ho ragione davvero."' },
         use:   null,
@@ -408,7 +408,7 @@ export const SCENES = {
       },
       {
         id: 'stagnola', emoji: '🫙', label: 'Rotolo di Stagnola',
-        x: 28, y: 68, size: 24,
+        x: 34, y: 74, size: 24,
         look: 'Carta stagnola. Buona per gli avanzi, migliore per i cappelli anti-controllo mentale.',
         pick:  { item: 'stagnola', msg: 'Marco prende la stagnola. "Non si sa mai."' },
         use:   null,

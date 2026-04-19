@@ -361,6 +361,81 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    // ── Bed frame (behind letto, left of center) ────────────────────────────────
+
+    const bdX = W * 0.135, bdY = H * 0.41, bdW = 138;
+    // Bed frame — dark wood
+    g.fillStyle(0x221006, 1);
+    g.fillRect(bdX, bdY, bdW, H * 0.78 - bdY);
+    // Headboard panel (raised)
+    g.fillStyle(0x321808, 1);
+    g.fillRect(bdX + 5, bdY + 4, bdW - 10, 54);
+    // Headboard inner panel detail
+    g.fillStyle(0x3e2010, 0.7);
+    g.fillRect(bdX + 12, bdY + 10, bdW - 24, 40);
+    // Headboard top rail
+    g.fillStyle(0x2a1408, 1);
+    g.fillRect(bdX, bdY, bdW, 6);
+    // Side rails
+    g.fillStyle(0x221006, 1);
+    g.fillRect(bdX, bdY + 58, 10, H * 0.78 - bdY - 58);
+    g.fillRect(bdX + bdW - 10, bdY + 58, 10, H * 0.78 - bdY - 58);
+    // Mattress surface
+    g.fillStyle(0xd8cdb8, 0.22);
+    g.fillRect(bdX + 10, bdY + 58, bdW - 20, H * 0.78 - bdY - 62);
+    // Pillow
+    g.fillStyle(0xf5f0e8, 0.35);
+    g.fillRect(bdX + 14, bdY + 60, 50, 28);
+    g.lineStyle(1, 0xe8e0d0, 0.2);
+    g.strokeRect(bdX + 16, bdY + 62, 46, 24);
+
+    // ── Writing desk (behind scrivania + giornale) ──────────────────────────────
+
+    // scrivania is at x=57% → pxX(57)=456, giornale at x=70% → pxX(70)=560
+    const dkX = W * 0.41, dkTopY = H * 0.64, dkW = W * 0.35;
+
+    // Desktop surface — dark wood plank
+    g.fillStyle(0x3c1e08, 1);
+    g.fillRect(dkX, dkTopY - 12, dkW, 12);
+    // Top edge highlight
+    g.fillStyle(0x5e3212, 1);
+    g.fillRect(dkX, dkTopY - 12, dkW, 2);
+    // Wood grain on surface
+    g.lineStyle(1, 0x301408, 0.4);
+    for (let gx = dkX + 8; gx < dkX + dkW - 8; gx += 18) {
+      g.lineBetween(gx, dkTopY - 12, gx + 8, dkTopY);
+    }
+    // Front apron
+    g.fillStyle(0x2e1606, 1);
+    g.fillRect(dkX + 10, dkTopY, dkW - 20, 14);
+    // Drawer hint
+    g.lineStyle(1, 0x4a2a0e, 0.7);
+    g.strokeRect(dkX + dkW * 0.3, dkTopY + 2, dkW * 0.38, 10);
+    g.fillStyle(0x6a3a18, 0.6);
+    g.fillCircle(dkX + dkW * 0.49, dkTopY + 7, 2);  // drawer knob
+    // Desk legs
+    const legH = H * 0.78 - (dkTopY + 14);
+    g.fillStyle(0x2a1406, 1);
+    g.fillRect(dkX + 12, dkTopY + 14, 14, legH);
+    g.fillRect(dkX + dkW - 26, dkTopY + 14, 14, legH);
+    // Leg highlights
+    g.fillStyle(0x4a2810, 0.35);
+    g.fillRect(dkX + 12, dkTopY + 14, 4, legH);
+    g.fillRect(dkX + dkW - 26, dkTopY + 14, 4, legH);
+    // Papers / clutter on desk surface
+    g.fillStyle(0xfff8e8, 0.80);
+    g.fillRect(dkX + 22, dkTopY - 22, 52, 12);
+    g.fillRect(dkX + 20, dkTopY - 19, 52, 9);
+    g.fillStyle(0x8b1a1a, 1);
+    g.fillRect(dkX + 85, dkTopY - 26, 22, 16);
+    g.fillStyle(0x1a3d8b, 1);
+    g.fillRect(dkX + 90, dkTopY - 32, 20, 12);
+
+    // ── Floor / wall junction — shadow strip ────────────────────────────────────
+
+    g.fillStyle(0x000000, 0.18);
+    g.fillRect(0, H * 0.755, W, H * 0.78 - H * 0.755);
+
     // ── Ceiling lamp ────────────────────────────────────────────────────────────
 
     const lX = W * 0.50, lY = H * 0.07;
@@ -397,9 +472,9 @@ export class GameScene extends Phaser.Scene {
     g.fillStyle(0xff8800, 0.04);
     g.fillEllipse(lX, H * 0.45, 500, 360);
 
-    // Computer screen blue glow (right area, where scrivania object will be)
+    // Computer screen blue glow (at scrivania position x=57%)
     g.fillStyle(0x2244cc, 0.06);
-    g.fillEllipse(W * 0.62, H * 0.52, 200, 160);
+    g.fillEllipse(W * 0.57, H * 0.55, 200, 140);
 
     // Corner vignettes — darken edges for depth
     g.fillGradientStyle(0x000000, 0x00000000, 0x000000, 0x00000000, 0.45);
