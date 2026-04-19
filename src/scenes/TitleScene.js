@@ -362,8 +362,8 @@ export class TitleScene extends Phaser.Scene {
     this._addGlassButton(GAME_W / 2, y0, '▶  INIZIA L\'AVVENTURA', false, () => {
       playTrack('title');
       resetGame();
+      // UIScene is launched from GameScene.create only — double launch breaks listeners / input.
       this.scene.start('GameScene');
-      this.scene.launch('UIScene');
     });
 
     const continueBtn = this._addGlassButton(
@@ -375,7 +375,6 @@ export class TitleScene extends Phaser.Scene {
         if (loadSave()) {
           playTrack('title');
           this.scene.start('GameScene');
-          this.scene.launch('UIScene');
         } else {
           continueBtn.label.setText('  Nessun salvataggio  ');
           this.time.delayedCall(1800, () => continueBtn.label.setText('↺  CONTINUA'));

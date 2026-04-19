@@ -67,16 +67,18 @@ export class GameScene extends Phaser.Scene {
       .setOrigin(0.5, 1)
       .setDepth(5);
 
-    // Invisible floor plate: walk input lives here (depth 1) so exits (8), objects/NPCs (2+)
-    // receive clicks first. A global `input.on('pointerdown')` fires even when an interactive
-    // sprite is on top, which caused double-handling and “stuck” or erratic movement.
-    this._walkPlate = this.add.rectangle(SCENE_W / 2, SCENE_H / 2, SCENE_W, SCENE_H, 0x000000, 0)
+    // Invisible hit area for walking. Use a Zone (not a zero-alpha Rectangle) so Phaser always
+    // keeps a reliable hit test; transparent rects can drop input on some setups.
+    this._walkPlate = this.add.zone(SCENE_W / 2, SCENE_H / 2, SCENE_W, SCENE_H)
       .setDepth(1)
       .setInteractive()
       .on('pointerdown', pointer => this.handleSceneClick(pointer));
 
-    // Launch UIScene as a simultaneous overlay
-    this.scene.launch('UIScene');
+    // HUD overlay — only one launch (TitleScene must not also call launch, or UIScene restarts
+    // and duplicates / tears down listeners tied to GameScene).
+    if (!this.scene.isActive('UIScene')) {
+      this.scene.launch('UIScene');
+    }
 
     // Wait one frame so UIScene has time to create and register its event listeners
     this.time.delayedCall(50, () => {
@@ -1742,8 +1744,8 @@ export class GameScene extends Phaser.Scene {
 
   /** Called when the player clicks empty space in the scene area. */
   handleSceneClick(pointer) {
-    const wx = pointer.worldX;
-    const wy = pointer.worldY;
+    const wx = pointer.worldX != null ? pointer.worldX : pointer.x;
+    const wy = pointer.worldY != null ? pointer.worldY : pointer.y;
     if (wy >= SCENE_H || wx < 0 || wx > SCENE_W) return;
     if (getVerb() !== 'walk') return;
     const ui = this.scene.get('UIScene');
