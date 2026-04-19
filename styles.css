@@ -67,7 +67,7 @@ html,body{
   background:var(--black);
   display:grid;
   grid-template-columns:1fr;
-  grid-template-rows:1fr 26px 148px;
+  grid-template-rows:1fr 52px 148px;
 }
 
 /* ── SCENE AREA ── */
@@ -139,11 +139,11 @@ html,body{
 #msgBar{
   background:var(--panel);
   border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-  display:flex;align-items:center;padding:0 10px;
-  font-size:8px;overflow:hidden;white-space:nowrap;gap:0;
+  display:flex;align-items:flex-start;padding:6px 10px;
+  font-size:8px;gap:0;
 }
-#verbLabel{color:var(--gold);flex-shrink:0}
-#msgText{color:var(--text);margin-left:4px;overflow:hidden;text-overflow:ellipsis}
+#verbLabel{color:var(--gold);flex-shrink:0;line-height:1.8}
+#msgText{color:var(--text);margin-left:4px;line-height:1.8;white-space:normal}
 
 /* ── BOTTOM PANEL ── */
 #bottomPanel{
