@@ -2,20 +2,18 @@
 
 A point-and-click adventure game inspired by Zak McKracken and the Alien Mindbenders (LucasArts, 1988).
 
-Built in plain HTML/CSS/JavaScript as a learning project — every design decision is documented in the code.
+Built with **Phaser 3** + **Vite** as a learning project — every design decision is documented in the code.
 
 ---
 
-## How to play
-
-ES modules require a local web server (browsers block them on `file://`).
+## How to run
 
 ```bash
-# from the project folder:
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Then open **http://localhost:8000** in your browser.
+Then open **http://localhost:5501** in your browser.
 
 ---
 
@@ -30,27 +28,36 @@ Navigate 6 locations, collect items, talk to NPCs, and destroy the alien transmi
 ## Project structure
 
 ```
-index.html          entry point — HTML skeleton
-styles.css          all visual styles (pixel font, scene layout, animations)
+index.html              entry point — canvas host + inline styles
+vite.config.js          dev server config (port 5501)
+package.json            dependencies: phaser, vite
 
-js/
-  data.js           pure game content: scenes, objects, items, dialogues
-  state.js          game state: inventory, flags, save/load
-  engine.js         game logic: rendering, verbs, interactions, dialogue
-  main.js           entry point: wires buttons and boots the game
+src/
+  main.js               Phaser.Game config, scene registration
+  constants.js          all layout dimensions (canvas size, panel heights)
 
-data.js             (v1 reference — original monolithic data file)
-engine.js           (v1 reference — original monolithic engine)
+  data/
+    data.js             pure game content: scenes, objects, items, dialogues
+
+  game/
+    state.js            game state: inventory, flags, verb, save/load
+
+  scenes/
+    BootScene.js        asset preloader → starts TitleScene
+    TitleScene.js       title screen with animated UFO and start/continue buttons
+    GameScene.js        main game: backgrounds, objects, character, interactions
+    UIScene.js          persistent HUD overlay: verb bar, inventory, message bar, dialogue
+    EndScene.js         victory screen with restart button
 ```
 
-### Why four files?
+### Separation of concerns
 
-| File | Responsibility | Can it change without affecting the others? |
+| File | Responsibility | Can it change independently? |
 |---|---|---|
-| `data.js` | What the game says and contains | Yes — edit story without touching the engine |
-| `state.js` | What has happened so far | Yes — swap to a database, server, etc. |
-| `engine.js` | How the game runs | Yes — change mechanics without touching story |
-| `main.js` | How the game starts | Yes — swap to keyboard controls, different UI |
+| `data/data.js` | What the game says and contains | Yes — edit story without touching the engine |
+| `game/state.js` | What has happened so far | Yes — swap to server storage, etc. |
+| `scenes/GameScene.js` | How the world renders and responds | Yes — change mechanics without touching story |
+| `scenes/UIScene.js` | The persistent HUD | Yes — redesign UI without touching game logic |
 
 This separation is called **separation of concerns** and is one of the most important ideas in software design.
 
@@ -60,16 +67,12 @@ This separation is called **separation of concerns** and is one of the most impo
 
 | Concept | Where to find it |
 |---|---|
-| ES Modules (`import`/`export`) | top of every `js/` file |
-| Pure data vs logic | `js/data.js` (zero functions) vs `js/engine.js` |
-| State encapsulation | `js/state.js` — getters/setters pattern |
-| Event listeners | `js/main.js` — `DOMContentLoaded`, `addEventListener` |
-| CSS Grid layout | `styles.css` — `#gameScreen` |
-| Closures | `js/engine.js` — `openDialogue()`, the `lineIndex` variable |
-| Data-driven actions | `js/data.js` — `requireItem`, `setFlag`, `action` descriptors |
-
----
-
-## Running the v1 reference files
-
-The root `data.js` and `engine.js` are the original single-file version of the game kept for comparison. They are no longer loaded by `index.html`.
+| ES Modules (`import`/`export`) | top of every `src/` file |
+| Pure data vs logic | `data/data.js` (zero functions) vs `GameScene.js` |
+| State encapsulation | `game/state.js` — getters/setters pattern |
+| Multiple simultaneous scenes | `main.js` + `GameScene.create()` — `scene.launch('UIScene')` |
+| Cross-scene communication | `GameScene` emits events → `UIScene` listens via `this.gameScene.events.on()` |
+| Programmatic graphics | `GameScene._bgAppartamento()` etc. — Phaser Graphics API |
+| Tweens | `GameScene._walkTo()` — smooth character movement |
+| Camera effects | `GameScene._destroyTransmitter()` — flash + shake |
+| Data-driven actions | `data/data.js` — `requireItem`, `setFlag`, `action` descriptors |
