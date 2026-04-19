@@ -228,8 +228,8 @@ const TRACKS = {
 
 // ── Engine internals ──────────────────────────────────────────────────────────
 
-let _ctx  = null;
-let _gain = null;
+let _ctx    = null;
+let _gain   = null;
 let _timer  = null;
 let _voices = null;
 
@@ -243,6 +243,20 @@ function _getCtx() {
   _gain.gain.value = 0.36;
   _gain.connect(_ctx.destination);
   return _ctx;
+}
+
+function _hardStop() {
+  if (_timer) { clearTimeout(_timer); _timer = null; }
+  _voices = null;
+  if (_gain && _ctx) {
+    _gain.gain.cancelScheduledValues(_ctx.currentTime);
+    _gain.gain.setValueAtTime(0, _ctx.currentTime);
+  }
+}
+
+function _closeCtx() {
+  _hardStop();
+  if (_ctx) { _ctx.close(); _ctx = null; _gain = null; }
 }
 
 function _playNote(freq, t, dur, wave, vol) {
@@ -278,6 +292,28 @@ function _tick() {
   _timer = setTimeout(_tick, TICK);
 }
 
+// ── Page lifecycle handlers ───────────────────────────────────────────────────
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    // Tab hidden — suspend context and pause scheduler
+    if (_timer) { clearTimeout(_timer); _timer = null; }
+    if (_ctx) _ctx.suspend();
+  } else {
+    // Tab visible again — resume and restart scheduler
+    if (_ctx) _ctx.resume().then(() => { if (_voices) _tick(); });
+  }
+});
+
+window.addEventListener('pagehide', _closeCtx);
+window.addEventListener('beforeunload', _closeCtx);
+
+// HMR cleanup: when Vite hot-reloads this module, kill the old AudioContext
+// so orphaned oscillators from the previous version don't keep playing.
+if (import.meta.hot) {
+  import.meta.hot.dispose(_closeCtx);
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 export function playTrack(name) {
@@ -286,8 +322,12 @@ export function playTrack(name) {
   const track = TRACKS[name];
   if (!track) return;
 
-  const ctx  = _getCtx();
+  const ctx = _getCtx();
   if (ctx.state === 'suspended') ctx.resume();
+
+  // Restore gain in case it was silenced by stopMusic
+  _gain.gain.cancelScheduledValues(ctx.currentTime);
+  _gain.gain.setValueAtTime(0.36, ctx.currentTime);
 
   const beat = 60 / track.bpm;
   const now  = ctx.currentTime + 0.05;
@@ -307,12 +347,10 @@ export function playTrack(name) {
 export function stopMusic() {
   if (_timer) { clearTimeout(_timer); _timer = null; }
   _voices = null;
-  // Fade master gain to silence instead of a hard cut
-  if (_gain) {
-    _gain.gain.setValueAtTime(_gain.gain.value, _getCtx().currentTime);
-    _gain.gain.linearRampToValueAtTime(0, _getCtx().currentTime + 0.4);
-    setTimeout(() => {
-      if (_gain) _gain.gain.value = 0.36;
-    }, 500);
+  // Short fade so it doesn't click, then reset gain for next playTrack()
+  if (_gain && _ctx) {
+    _gain.gain.cancelScheduledValues(_ctx.currentTime);
+    _gain.gain.setValueAtTime(_gain.gain.value, _ctx.currentTime);
+    _gain.gain.linearRampToValueAtTime(0, _ctx.currentTime + 0.08);
   }
 }
