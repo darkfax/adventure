@@ -46,9 +46,9 @@ export class UIScene extends Phaser.Scene {
 
     this.drawPanelBackground();
     this.buildVerbBar();
-    this.refreshVerbBar(getVerb());
     this.buildInventory();
     this.buildMessageBar();
+    this.refreshVerbBar(getVerb());
     this.buildDialogueBox();
 
     // Listen for events emitted by GameScene
