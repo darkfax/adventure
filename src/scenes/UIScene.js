@@ -27,6 +27,14 @@ import {
   getInventory, hasItem,
 } from '../game/state.js';
 import { GAME_W, MSG_Y, MSG_H, PANEL_Y, PANEL_H, VERB_W, INV_X, FONT, SCENE_H } from '../constants.js';
+import { FONT_CINEMA } from '../game/visualTheme.js';
+
+const D_PANEL = 0;
+const D_VERB_BG = 1;
+const D_VERB_TXT = 2;
+const D_MSG = 3;
+const D_INV = 2;
+const D_DLG = 100;
 
 export class UIScene extends Phaser.Scene {
   constructor() {
@@ -38,6 +46,7 @@ export class UIScene extends Phaser.Scene {
 
     this.drawPanelBackground();
     this.buildVerbBar();
+    this.refreshVerbBar(getVerb());
     this.buildInventory();
     this.buildMessageBar();
     this.buildDialogueBox();
@@ -60,41 +69,47 @@ export class UIScene extends Phaser.Scene {
   // ── Panel background ───────────────────────────────────────────────────────
 
   drawPanelBackground() {
-    const g = this.add.graphics();
+    const g = this.add.graphics().setDepth(D_PANEL);
 
-    // Message bar background
-    g.fillStyle(0x0a0a1e, 1);
+    g.fillGradientStyle(0x040810, 0x060c18, 0x080a14, 0x080a14, 1, 1, 1, 1);
     g.fillRect(0, MSG_Y, GAME_W, MSG_H);
-    g.lineStyle(1, 0x1e1e3e, 1);
+    g.lineStyle(1, 0x4eefff, 0.28);
+    g.lineBetween(0, MSG_Y, GAME_W, MSG_Y);
+    g.lineStyle(1, 0x1a3048, 0.85);
     g.strokeRect(0, MSG_Y, GAME_W, MSG_H);
 
-    // Bottom panel background
-    g.fillStyle(0x0a0a1e, 1);
+    g.fillGradientStyle(0x060a14, 0x060a14, 0x0a1424, 0x081018, 1);
     g.fillRect(0, PANEL_Y, GAME_W, PANEL_H);
-
-    // Divider between verb and inventory panels
-    g.lineStyle(1, 0x1e1e3e, 1);
-    g.lineBetween(VERB_W + 10, PANEL_Y, VERB_W + 10, PANEL_Y + PANEL_H);
-
-    // Top border of bottom panel
-    g.lineStyle(2, 0x1e1e3e, 1);
+    g.lineStyle(2, 0x4eefff, 0.22);
     g.lineBetween(0, PANEL_Y, GAME_W, PANEL_Y);
+    g.lineStyle(1, 0xff4ec8, 0.1);
+    g.lineBetween(0, PANEL_Y + 2, GAME_W, PANEL_Y + 2);
+
+    g.lineStyle(1, 0x2a4a6a, 0.75);
+    g.lineBetween(VERB_W + 10, PANEL_Y, VERB_W + 10, PANEL_Y + PANEL_H);
+    g.lineStyle(1, 0x4eefff, 0.12);
+    g.lineBetween(VERB_W + 11, PANEL_Y + 6, VERB_W + 11, PANEL_Y + PANEL_H - 6);
   }
 
   // ── Message bar ────────────────────────────────────────────────────────────
 
   buildMessageBar() {
-    // Verb label (gold, left side)
     this._verbLabel = this.add.text(10, MSG_Y + MSG_H / 2, 'Cammina', {
-      fontFamily: FONT, fontSize: '8px', color: '#ffdd57',
-    }).setOrigin(0, 0.5);
+      fontFamily: FONT_CINEMA,
+      fontSize: '9px',
+      color: '#ffe8a8',
+      letterSpacing: '0.04em',
+    })
+      .setOrigin(0, 0.5)
+      .setDepth(D_MSG);
 
-    // Message text (right of verb label, wraps)
-    this._msgText = this.add.text(0, MSG_Y + 8, '', {
-      fontFamily: FONT, fontSize: '7px', color: '#c8c8e8',
+    this._msgText = this.add.text(10, MSG_Y + 8, '', {
+      fontFamily: FONT,
+      fontSize: '7px',
+      color: '#d8e0f0',
       wordWrap: { width: GAME_W - 20 },
       lineSpacing: 4,
-    }).setX(10);
+    }).setDepth(D_MSG);
   }
 
   setMessage(text) {
@@ -145,19 +160,18 @@ export class UIScene extends Phaser.Scene {
       const btn = this.add.text(x, y, v.label, {
         fontFamily: FONT,
         fontSize:   '7px',
-        color:      v.id === getVerb() ? '#ffffff' : '#7ec8e3',
+        color:      v.id === getVerb() ? '#ffffff' : '#9ee8ff',
         padding:    { x: 4, y: 4 },
         align:      'center',
       })
         .setOrigin(0.5)
+        .setDepth(D_VERB_TXT)
         .setInteractive({ useHandCursor: true });
 
-      // Active background rectangle (hidden unless active)
-      const bg = this.add.rectangle(x, y, btnW - 4, btnH - 4, 0x1e1e3e, 0)
-        .setDepth(-1);
+      const bg = this.add.graphics().setDepth(D_VERB_BG);
 
       btn.on('pointerover',  () => { if (getVerb() !== v.id) btn.setColor('#ffffff'); });
-      btn.on('pointerout',   () => { if (getVerb() !== v.id) btn.setColor('#7ec8e3'); });
+      btn.on('pointerout',   () => { if (getVerb() !== v.id) btn.setColor('#9ee8ff'); });
       btn.on('pointerdown',  () => {
         setVerb(v.id);
         this.refreshVerbBar(v.id);
@@ -171,8 +185,17 @@ export class UIScene extends Phaser.Scene {
   refreshVerbBar(activeId) {
     Object.entries(this._verbBtns).forEach(([id, { btn, bg }]) => {
       const isActive = id === activeId;
-      btn.setColor(isActive ? '#ffffff' : '#7ec8e3');
-      bg.setFillStyle(isActive ? 0x1e1e3e : 0x000000, isActive ? 1 : 0);
+      btn.setColor(isActive ? '#ffffff' : '#9ee8ff');
+      bg.clear();
+      if (isActive) {
+        const b = btn.getBounds();
+        bg.fillStyle(0x1a3a52, 0.88);
+        bg.fillRoundedRect(b.x - 6, b.y - 4, b.width + 12, b.height + 8, 8);
+        bg.lineStyle(1, 0x4eefff, 0.65);
+        bg.strokeRoundedRect(b.x - 6, b.y - 4, b.width + 12, b.height + 8, 8);
+        bg.lineStyle(1, 0xa8f6ff, 0.2);
+        bg.strokeRoundedRect(b.x - 4, b.y - 2, b.width + 8, b.height + 4, 6);
+      }
     });
     const verbName = VERBS.find(v => v.id === activeId)?.label ?? '';
     this._verbLabel.setVisible(true).setText(verbName);
@@ -195,16 +218,16 @@ export class UIScene extends Phaser.Scene {
         const idx = r * cols + c;
 
         // Slot border (hidden unless occupied)
-        const border = this.add.graphics();
+        const border = this.add.graphics().setDepth(D_INV);
 
         // Emoji text (hidden until item is assigned)
-        const emoji = this.add.text(x, y - 6, '', { fontSize: '20px' }).setOrigin(0.5);
+        const emoji = this.add.text(x, y - 6, '', { fontSize: '20px' }).setOrigin(0.5).setDepth(D_INV);
         const name  = this.add.text(x, y + 14, '', {
-          fontFamily: FONT, fontSize: '5px', color: '#5a5a7a', align: 'center',
+          fontFamily: FONT, fontSize: '5px', color: '#7a8aa8', align: 'center',
           wordWrap: { width: slotW - 4 },
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setDepth(D_INV);
 
-        const zone = this.add.zone(x, y, slotW, slotH).setInteractive({ useHandCursor: true });
+        const zone = this.add.zone(x, y, slotW, slotH).setInteractive({ useHandCursor: true }).setDepth(D_INV);
         zone.on('pointerover',  () => { if (this._invSlots[idx].item) this.setHoverLabel(ITEMS[this._invSlots[idx].item].label); });
         zone.on('pointerout',   () => this.setHoverLabel(''));
         zone.on('pointerdown',  () => { if (this._invSlots[idx].item) this.gameScene.onInventoryClick(this._invSlots[idx].item); });
@@ -229,10 +252,17 @@ export class UIScene extends Phaser.Scene {
         slot.emoji.setText(item.emoji);
         slot.name.setText(item.label);
 
-        // Armed item gets gold border
-        const borderColor = armed === itemId ? 0xffdd57 : 0x1e1e3e;
-        slot.border.lineStyle(1, borderColor, 1);
-        slot.border.strokeRect(slot.x - slot.slotW / 2 + 1, slot.y - slot.slotH / 2 + 1, slot.slotW - 2, slot.slotH - 2);
+        const borderColor = armed === itemId ? 0xffdd57 : 0x3a5a78;
+        const lx = slot.x - slot.slotW / 2 + 2;
+        const ly = slot.y - slot.slotH / 2 + 2;
+        const lw = slot.slotW - 4;
+        const lh = slot.slotH - 4;
+        slot.border.lineStyle(armed === itemId ? 2 : 1, borderColor, 1);
+        slot.border.strokeRoundedRect(lx, ly, lw, lh, 8);
+        if (armed === itemId) {
+          slot.border.lineStyle(1, 0xfff8c8, 0.35);
+          slot.border.strokeRoundedRect(lx + 2, ly + 2, lw - 4, lh - 4, 6);
+        }
       } else {
         slot.emoji.setText('');
         slot.name.setText('');
@@ -243,35 +273,41 @@ export class UIScene extends Phaser.Scene {
   // ── Dialogue box ───────────────────────────────────────────────────────────
 
   buildDialogueBox() {
-    // Container groups all dialogue elements so they can be shown/hidden together
-    this._dlg = this.add.container(0, 0).setVisible(false);
+    this._dlg = this.add.container(0, 0).setVisible(false).setDepth(D_DLG);
 
-    // Semi-transparent overlay on scene area
     const overlay = this.add.graphics();
-    overlay.fillStyle(0x000000, 0.5);
+    overlay.fillGradientStyle(0x000008, 0x000008, 0x0a0518, 0x0a0518, 0.55, 0.55, 0.65, 0.65);
     overlay.fillRect(0, 0, GAME_W, SCENE_H);
 
-    // Box background
-    const boxX = 12, boxY = SCENE_H - 180, boxW = GAME_W - 24, boxH = 170;
+    const boxX = 12;
+    const boxY = SCENE_H - 182;
+    const boxW = GAME_W - 24;
+    const boxH = 172;
+    const r = 14;
     const box = this.add.graphics();
-    box.fillStyle(0x05051a, 0.97);
-    box.fillRect(boxX, boxY, boxW, boxH);
-    box.lineStyle(2, 0x7ec8e3, 1);
-    box.strokeRect(boxX, boxY, boxW, boxH);
+    box.fillStyle(0x060a18, 0.94);
+    box.fillRoundedRect(boxX, boxY, boxW, boxH, r);
+    box.lineStyle(2, 0x4eefff, 0.75);
+    box.strokeRoundedRect(boxX, boxY, boxW, boxH, r);
+    box.lineStyle(1, 0xff4ec8, 0.18);
+    box.strokeRoundedRect(boxX + 3, boxY + 3, boxW - 6, boxH - 6, r - 3);
 
-    // Speaker name
-    this._dlgSpeaker = this.add.text(boxX + 12, boxY + 12, '', {
-      fontFamily: FONT, fontSize: '8px', color: '#ffdd57',
+    this._dlgSpeaker = this.add.text(boxX + 16, boxY + 14, '', {
+      fontFamily: FONT_CINEMA,
+      fontSize: '10px',
+      color: '#ffe8a8',
+      letterSpacing: '0.06em',
     });
 
-    // Body text
-    this._dlgText = this.add.text(boxX + 12, boxY + 36, '', {
-      fontFamily: FONT, fontSize: '7px', color: '#c8c8e8',
-      wordWrap: { width: boxW - 24 }, lineSpacing: 6,
+    this._dlgText = this.add.text(boxX + 16, boxY + 38, '', {
+      fontFamily: FONT,
+      fontSize: '7px',
+      color: '#d8e4f5',
+      wordWrap: { width: boxW - 32 },
+      lineSpacing: 6,
     });
 
-    // Options container — positioned below body text
-    this._dlgOptions = this.add.container(boxX + 12, boxY + 105);
+    this._dlgOptions = this.add.container(boxX + 16, boxY + 108);
 
     this._dlg.add([overlay, box, this._dlgSpeaker, this._dlgText, this._dlgOptions]);
   }
@@ -331,12 +367,12 @@ export class UIScene extends Phaser.Scene {
 
   _addDlgButton(label, onClick, index = 0) {
     const btn = this.add.text(0, index * 24, label, {
-      fontFamily: FONT, fontSize: '7px', color: '#7ec8e3',
+      fontFamily: FONT, fontSize: '7px', color: '#9ee8ff',
       padding: { x: 6, y: 4 },
     }).setInteractive({ useHandCursor: true });
 
     btn.on('pointerover',  () => btn.setColor('#ffffff'));
-    btn.on('pointerout',   () => btn.setColor('#7ec8e3'));
+    btn.on('pointerout',   () => btn.setColor('#9ee8ff'));
     btn.on('pointerdown',  onClick);
     this._dlgOptions.add(btn);
   }

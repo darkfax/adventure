@@ -21,6 +21,7 @@
  */
 
 import { buildCharacterTextures } from '../game/characters.js';
+import { ensureSharedTextures } from '../game/sharedTextures.js';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -32,6 +33,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   create() {
+    ensureSharedTextures(this);
     buildCharacterTextures(this);
     this.scene.start('TitleScene');
   }

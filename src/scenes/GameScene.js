@@ -37,6 +37,7 @@ import {
   getInventory, saveGame,
 } from '../game/state.js';
 import { SCENE_W, SCENE_H, FONT } from '../constants.js';
+import { FONT_CINEMA }            from '../game/visualTheme.js';
 import { playTrack }              from '../audio/music.js';
 
 // ── Coordinate helpers ────────────────────────────────────────────────────────
@@ -131,6 +132,12 @@ export class GameScene extends Phaser.Scene {
       this.spawnPlok();
     }
 
+    if (id === 'tetto') {
+      this.time.delayedCall(120, () => {
+        this.cameras.main.shake(200, 0.0045, false);
+      });
+    }
+
     this.resetCharacter();
     this.events.emit('verbChanged', 'walk');
     this.events.emit('msg', '');
@@ -155,12 +162,85 @@ export class GameScene extends Phaser.Scene {
       case 'tetto':        this._bgTetto(g);         break;
     }
 
-    // Scene name label
-    if (this._sceneLabel) this._sceneLabel.destroy();
-    this._sceneLabel = this.add.text(10, 8, scene.name, {
-      fontFamily: FONT, fontSize: '7px', color: '#5a5a7a',
-      backgroundColor: '#050510cc', padding: { x: 8, y: 4 },
-    }).setDepth(8);
+    this._applyLocationAtmosphere(id);
+
+    // Location badge (Orbitron + rounded chrome — matches title / HUD)
+    if (this._sceneLabelWrap) this._sceneLabelWrap.destroy(true);
+    const badgeText = this.add.text(14, 10, scene.name, {
+      fontFamily: FONT_CINEMA,
+      fontSize:   '10px',
+      color:      '#d8f8ff',
+      letterSpacing: '0.05em',
+    });
+    const b = badgeText.getBounds();
+    const badgeBg = this.add.graphics();
+    badgeBg.fillStyle(0x060a12, 0.85);
+    badgeBg.fillRoundedRect(b.x - 10, b.y - 6, b.width + 20, b.height + 12, 10);
+    badgeBg.lineStyle(1, 0x4eefff, 0.5);
+    badgeBg.strokeRoundedRect(b.x - 10, b.y - 6, b.width + 20, b.height + 12, 10);
+    badgeBg.lineStyle(1, 0xa8f6ff, 0.12);
+    badgeBg.strokeRoundedRect(b.x - 8, b.y - 4, b.width + 16, b.height + 8, 8);
+    this._sceneLabelWrap = this.add.container(6, 4, [badgeBg, badgeText]).setDepth(8);
+  }
+
+  /**
+   * Unified film grade + vignette on the playable area (sits on _atmGraphics, depth 1).
+   */
+  _applyLocationAtmosphere(id) {
+    const a = this._atmGraphics;
+    const W = SCENE_W;
+    const H = SCENE_H;
+    a.clear();
+
+    a.fillGradientStyle(0x00a8d0, 0xff3088, 0x080410, 0x040208, 0.055, 0.04, 0.02, 0.028);
+    a.fillRect(0, 0, W, H);
+
+    if (id === 'appartamento' || id === 'pizzeria') {
+      a.fillStyle(0xffaa66, 0.038);
+      a.fillRect(0, 0, W, H);
+    }
+
+    if (id === 'retrobottega') {
+      a.fillStyle(0xff2040, 0.052);
+      a.fillRect(0, 0, W, H);
+      a.fillStyle(0x000000, 0.09);
+      a.fillRect(0, 0, W, H * 0.1);
+    }
+
+    if (id === 'tetto') {
+      const post = getFlag('trasmettitore_distrutto');
+      a.fillStyle(0xff2040, post ? 0.1 : 0.082);
+      a.fillRect(0, 0, W, H);
+      // Alien rim light from skyline / horizon
+      a.fillGradientStyle(0x000000, 0x000000, 0x00c8a0, 0x6a20c0, 0, 0, post ? 0.14 : 0.08, post ? 0.1 : 0.055);
+      a.fillRect(0, H * 0.52, W, H * 0.48);
+      a.fillStyle(0x000000, 0.13);
+      a.fillRect(0, 0, W, H * 0.14);
+      if (post) {
+        a.fillStyle(0x4a0088, 0.055);
+        a.fillRect(0, 0, W, H);
+        a.fillStyle(0x000000, 0.1);
+        a.fillRect(0, 0, W, 20);
+        a.fillRect(0, H - 34, W, 34);
+        a.fillStyle(0xff3060, 0.035);
+        a.fillRect(0, 0, W, H);
+      }
+    }
+
+    if (id === 'strada' || id === 'piazza') {
+      a.fillStyle(0x4466ff, 0.025);
+      a.fillRect(0, 0, W, H);
+    }
+
+    a.fillStyle(0x000000, 0.2);
+    a.fillRect(0, 0, W, 22);
+    a.fillRect(0, H - 32, W, 32);
+    a.fillStyle(0x000000, 0.18);
+    a.fillRect(0, 0, 26, H);
+    a.fillRect(W - 26, 0, 26, H);
+
+    a.fillGradientStyle(0x000000, 0x000000, 0x0a1a28, 0x180a20, 0, 0, 0.28, 0.2);
+    a.fillRect(0, H - 52, W, 52);
   }
 
   // ────────────────────────────────── APPARTAMENTO ───────────────────────────
@@ -605,7 +685,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     // ── Puddle reflections on road ──────────────────────────────────────────────
-    g.fillStyle(0x2020608, 0.25);
+    g.fillStyle(0x202060, 0.25);
     g.fillEllipse(W*0.32, H*0.90, 80, 12);
     g.fillStyle(0xffee44, 0.06);
     g.fillEllipse(W*0.34, H*0.90, 40, 6);
@@ -1555,9 +1635,12 @@ export class GameScene extends Phaser.Scene {
 
     setFlag('trasmettitore_distrutto');
 
-    // Flash effect using camera
-    this.cameras.main.flash(800, 255, 255, 255);
-    this.cameras.main.shake(600, 0.015);
+    // Impact: snappy flash + layered shake (reads clearer than one long rumble)
+    this.cameras.main.flash(320, 255, 245, 255, false);
+    this.cameras.main.shake(480, 0.022, false);
+    this.time.delayedCall(200, () => {
+      this.cameras.main.shake(280, 0.012, false);
+    });
 
     this.events.emit('msg', 'KRAAKK! Marco colpisce il trasmettitore con tutta la forza. Scintille aliene volano ovunque! L\'antenna si piega, si storce e crolla. Il ronzio cessa. Silenzio.');
 
@@ -1615,6 +1698,9 @@ export class GameScene extends Phaser.Scene {
       .setOrigin(0.5, 1)
       .setDepth(3)
       .setInteractive({ useHandCursor: true });
+
+    this.cameras.main.flash(220, 140, 255, 200, false);
+    this.cameras.main.shake(380, 0.014, false);
 
     sprite.on('pointerover',  () => this._onHover('PLOK — Supervisore Galattico'));
     sprite.on('pointerout',   () => this._onHoverEnd());

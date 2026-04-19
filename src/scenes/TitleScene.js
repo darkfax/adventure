@@ -9,9 +9,8 @@ import Phaser from 'phaser';
 import { GAME_W, GAME_H, FONT } from '../constants.js';
 import { resetGame, loadSave } from '../game/state.js';
 import { playTrack } from '../audio/music.js';
-
-/** Display font for subtitle lines (loaded in index.html). */
-const FONT_CINEMA = '"Orbitron", system-ui, sans-serif';
+import { FONT_CINEMA } from '../game/visualTheme.js';
+import { ensureSharedTextures } from '../game/sharedTextures.js';
 
 /** Deterministic PRNG so stars look the same every boot (stable art direction). */
 function mulberry32(seed) {
@@ -29,6 +28,7 @@ export class TitleScene extends Phaser.Scene {
   }
 
   create() {
+    ensureSharedTextures(this);
     this._buildTextures();
     this._depth = { sky: 0, nebula: 2, planet: 4, stars: 6, haze: 8, vignette: 14, particles: 16, ufo: 18, title: 20, ui: 22 };
 
@@ -49,22 +49,8 @@ export class TitleScene extends Phaser.Scene {
   // ── Textures (one-shot, used by sprites / particles) ───────────────────────
 
   _buildTextures() {
-    // Soft dot for dust / engine glow
-    let g = this.add.graphics();
-    g.fillStyle(0xffffff, 1);
-    g.fillCircle(6, 6, 5);
-    g.generateTexture('_ttl_flare', 12, 12);
-    g.destroy();
-
-    // Tiny star stamp
-    g = this.add.graphics();
-    g.fillStyle(0xffffff, 1);
-    g.fillCircle(2, 2, 2);
-    g.generateTexture('_ttl_spark', 5, 5);
-    g.destroy();
-
     // Pixel-art UFO (replaces emoji for crisp pixelArt rendering)
-    g = this.add.graphics();
+    let g = this.add.graphics();
     const uw = 112;
     const uh = 64;
     const cx = uw / 2;
@@ -251,7 +237,7 @@ export class TitleScene extends Phaser.Scene {
   }
 
   _addAmbientParticles() {
-    const emitter = this.add.particles(0, 0, '_ttl_flare', {
+    const emitter = this.add.particles(0, 0, 'fx_flare', {
       emitZone: {
         type: 'random',
         source: new Phaser.Geom.Rectangle(0, 0, GAME_W, GAME_H),
@@ -289,7 +275,7 @@ export class TitleScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
     // Engine sparkles
-    const sparks = this.add.particles(0, 0, '_ttl_spark', {
+    const sparks = this.add.particles(0, 0, 'fx_spark', {
       speedY: { min: 40, max: 90 },
       speedX: { min: -16, max: 16 },
       lifespan: { min: 320, max: 520 },
