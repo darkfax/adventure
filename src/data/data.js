@@ -371,6 +371,11 @@ export const DIALOGUES = {
 //   requireItem — (optional) item that must be in inventory
 //   requireFlag — (optional) flag that must be set
 //   blockedMsg  — message shown when the condition is not met
+//
+// WALK BAND (optional):
+//   feetYMinPct, feetYMaxPct — Marco’s feet (sprite anchor) must stay between these
+//   % of scene height from the top. Stops “flying” in the sky / above the road.
+//   feetXMinPct, feetXMaxPct — optional horizontal margin (default ~4–96).
 
 export const SCENES = {
 
@@ -421,6 +426,8 @@ export const SCENES = {
     exits: [
       { label: '→ Strada', x: 88, y: 15, w: 12, h: 70, to: 'strada' },
     ],
+
+    walkBand: { feetYMinPct: 76, feetYMaxPct: 96, feetXMinPct: 6, feetXMaxPct: 94 },
   },
 
 
@@ -477,6 +484,8 @@ export const SCENES = {
       { label: '← Appartamento', x: 0,  y: 15, w: 11, h: 70, to: 'appartamento' },
       { label: '→ Piazza',       x: 88, y: 15, w: 12, h: 70, to: 'piazza'       },
     ],
+
+    walkBand: { feetYMinPct: 71, feetYMaxPct: 92, feetXMinPct: 5, feetXMaxPct: 95 },
   },
 
 
@@ -525,6 +534,8 @@ export const SCENES = {
       { label: '← Strada',   x: 0,  y: 15, w: 11, h: 70, to: 'strada'   },
       { label: '→ Pizzeria', x: 88, y: 15, w: 12, h: 70, to: 'pizzeria' },
     ],
+
+    walkBand: { feetYMinPct: 72, feetYMaxPct: 92, feetXMinPct: 5, feetXMaxPct: 95 },
   },
 
 
@@ -586,6 +597,8 @@ export const SCENES = {
         requireFlag: 'retro_open',
         blockedMsg: 'La porta del retrobottega è chiusa a chiave.' },
     ],
+
+    walkBand: { feetYMinPct: 74, feetYMaxPct: 94, feetXMinPct: 6, feetXMaxPct: 94 },
   },
 
 
@@ -640,6 +653,8 @@ export const SCENES = {
         requireItem: 'schema',
         blockedMsg: '"Devo prima capire cosa c\'è lassù." Marco esita sulla scala.' },
     ],
+
+    walkBand: { feetYMinPct: 73, feetYMaxPct: 93, feetXMinPct: 5, feetXMaxPct: 95 },
   },
 
 
@@ -687,6 +702,8 @@ export const SCENES = {
     // Coordinates where Plok appears after the transmitter is destroyed.
     // Used by the engine to place the Plok sprite dynamically.
     plokSpawn: { x: 62, y: 35, size: 46 },
+
+    walkBand: { feetYMinPct: 75, feetYMaxPct: 91, feetXMinPct: 6, feetXMaxPct: 94 },
   },
 
 };

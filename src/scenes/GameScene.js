@@ -67,11 +67,16 @@ export class GameScene extends Phaser.Scene {
       .setOrigin(0.5, 1)
       .setDepth(5);
 
+    // Invisible floor plate: walk input lives here (depth 1) so exits (8), objects/NPCs (2+)
+    // receive clicks first. A global `input.on('pointerdown')` fires even when an interactive
+    // sprite is on top, which caused double-handling and “stuck” or erratic movement.
+    this._walkPlate = this.add.rectangle(SCENE_W / 2, SCENE_H / 2, SCENE_W, SCENE_H, 0x000000, 0)
+      .setDepth(1)
+      .setInteractive()
+      .on('pointerdown', pointer => this.handleSceneClick(pointer));
+
     // Launch UIScene as a simultaneous overlay
     this.scene.launch('UIScene');
-
-    // Background click → walk (only when verb is walk and dialogue is closed)
-    this.input.on('pointerdown', pointer => this.handleSceneClick(pointer));
 
     // Wait one frame so UIScene has time to create and register its event listeners
     this.time.delayedCall(50, () => {
@@ -1497,8 +1502,11 @@ export class GameScene extends Phaser.Scene {
       this.events.emit('msg', exit.blockedMsg || 'Non puoi passare da lì.');
       return;
     }
-    const tx = (exit.x < 50) ? (exit.x + 8) / 100 * SCENE_W : (exit.x - 8) / 100 * SCENE_W;
-    this._walkTo(tx, SCENE_H * 0.84, () => {
+    // Walk to the exit zone center (top/bottom/side). Old code always used y = 84% height,
+    // so “go up to roof” exits moved Marco to the floor first — confusing and felt broken.
+    const tx = (exit.x + exit.w / 2) / 100 * SCENE_W;
+    const ty = (exit.y + exit.h / 2) / 100 * SCENE_H;
+    this._walkTo(tx, ty, () => {
       this.cameras.main.fadeOut(200, 0, 0, 0);
       this.time.delayedCall(220, () => {
         this.cameras.main.fadeIn(300, 0, 0, 0);
@@ -1655,7 +1663,27 @@ export class GameScene extends Phaser.Scene {
   // ── Character ──────────────────────────────────────────────────────────────
 
   resetCharacter() {
-    this._char.setPosition(SCENE_W * 0.18, SCENE_H * 0.84);
+    const p = this._clampFeetToWalkBand(SCENE_W * 0.18, SCENE_H * 0.84);
+    this._char.setPosition(p.x, p.y);
+  }
+
+  /**
+   * Keeps Marco’s feet on the “floor” / walkable ground for the current scene.
+   * Sprite origin is bottom-center — y is where the feet stand.
+   */
+  _clampFeetToWalkBand(x, y) {
+    const scene = SCENES[getScene()];
+    const b = scene.walkBand || {
+      feetYMinPct: 72, feetYMaxPct: 93, feetXMinPct: 5, feetXMaxPct: 95,
+    };
+    const yMin = (b.feetYMinPct / 100) * SCENE_H;
+    const yMax = (b.feetYMaxPct / 100) * SCENE_H;
+    const xMin = ((b.feetXMinPct ?? 5) / 100) * SCENE_W;
+    const xMax = ((b.feetXMaxPct ?? 95) / 100) * SCENE_W;
+    return {
+      x: Phaser.Math.Clamp(x, xMin, xMax),
+      y: Phaser.Math.Clamp(y, yMin, yMax),
+    };
   }
 
   /**
@@ -1665,12 +1693,13 @@ export class GameScene extends Phaser.Scene {
    * @param {Function} onComplete
    */
   _walkTo(x, y, onComplete) {
+    const p = this._clampFeetToWalkBand(x, y);
     this.tweens.killTweensOf(this._char);
-    const dist = Phaser.Math.Distance.Between(this._char.x, this._char.y, x, y);
+    const dist = Phaser.Math.Distance.Between(this._char.x, this._char.y, p.x, p.y);
     this.tweens.add({
       targets:  this._char,
-      x:        Math.min(SCENE_W - 20, Math.max(20, x)),
-      y:        Math.min(SCENE_H - 10, Math.max(30, y)),
+      x:        p.x,
+      y:        p.y,
       duration: Math.max(200, dist * 1.5),
       ease:     'Power1',
       onComplete,
@@ -1713,10 +1742,13 @@ export class GameScene extends Phaser.Scene {
 
   /** Called when the player clicks empty space in the scene area. */
   handleSceneClick(pointer) {
-    if (pointer.y >= SCENE_H) return;
+    const wx = pointer.worldX;
+    const wy = pointer.worldY;
+    if (wy >= SCENE_H || wx < 0 || wx > SCENE_W) return;
     if (getVerb() !== 'walk') return;
     const ui = this.scene.get('UIScene');
     if (ui?._dlg?.visible) return;  // don't walk while dialogue is open
-    this._walkTo(pointer.x, pointer.y, null);
+    // world coords stay correct when the camera shakes or fades
+    this._walkTo(wx, wy, null);
   }
 }
