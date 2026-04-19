@@ -13,6 +13,7 @@
 
 import { GAME_W, GAME_H, FONT } from '../constants.js';
 import { resetGame, loadSave }   from '../game/state.js';
+import { playTrack }             from '../audio/music.js';
 
 export class TitleScene extends Phaser.Scene {
   constructor() {
@@ -141,6 +142,7 @@ export class TitleScene extends Phaser.Scene {
 
   addButtons() {
     this.addButton(GAME_W / 2, GAME_H / 2 + 90, '▶  INIZIA L\'AVVENTURA', () => {
+      playTrack('title');
       resetGame();
       this.scene.start('GameScene');
       this.scene.launch('UIScene');
@@ -148,6 +150,7 @@ export class TitleScene extends Phaser.Scene {
 
     const continueBtn = this.addButton(GAME_W / 2, GAME_H / 2 + 128, '↺  CONTINUA', () => {
       if (loadSave()) {
+        playTrack('title');
         this.scene.start('GameScene');
         this.scene.launch('UIScene');
       } else {

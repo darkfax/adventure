@@ -20,16 +20,19 @@
  *   this.load.audio('theme', 'assets/music/theme.ogg');
  */
 
+import { buildCharacterTextures } from '../game/characters.js';
+
 export class BootScene extends Phaser.Scene {
   constructor() {
     super({ key: 'BootScene' });
   }
 
   preload() {
-    // No external assets yet — add them here when ready
+    // No external files — backgrounds and characters are drawn procedurally
   }
 
   create() {
+    buildCharacterTextures(this);
     this.scene.start('TitleScene');
   }
 }
