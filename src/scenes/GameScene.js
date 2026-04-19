@@ -67,12 +67,22 @@ export class GameScene extends Phaser.Scene {
       .setOrigin(0.5, 1)
       .setDepth(5);
 
-    // Invisible hit area for walking. Use a Zone (not a zero-alpha Rectangle) so Phaser always
-    // keeps a reliable hit test; transparent rects can drop input on some setups.
-    this._walkPlate = this.add.zone(SCENE_W / 2, SCENE_H / 2, SCENE_W, SCENE_H)
-      .setDepth(1)
-      .setInteractive()
-      .on('pointerdown', pointer => this.handleSceneClick(pointer));
+    // With multiple scenes (Game + HUD), Phaser defaults to globalTopOnly: the first scene that
+    // "captures" input blocks all others for that frame. That can freeze walking if the HUD
+    // scene runs first and mis-counts a capture, or if a full-screen invisible hit area misbehaves.
+    this.input.manager.globalTopOnly = false;
+
+    // Walk on empty scene clicks: POINTER_DOWN passes (pointer, currentlyOver). If the player
+    // clicked an exit / object / NPC, currentlyOver is non-empty — those objects already ran
+    // their own handlers in the same frame; we must not also issue a walk.
+    this._onPointerDownWalk = (pointer, currentlyOver) => {
+      if (currentlyOver && currentlyOver.length > 0) return;
+      this.handleSceneClick(pointer);
+    };
+    this.input.on('pointerdown', this._onPointerDownWalk, this);
+    this.events.once('shutdown', () => {
+      this.input.off('pointerdown', this._onPointerDownWalk, this);
+    });
 
     // HUD overlay — only one launch (TitleScene must not also call launch, or UIScene restarts
     // and duplicates / tears down listeners tied to GameScene).
