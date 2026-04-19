@@ -156,53 +156,246 @@ export class GameScene extends Phaser.Scene {
   _bgAppartamento(g) {
     const W = SCENE_W, H = SCENE_H;
 
-    // Warm dark room — back wall
-    g.fillGradientStyle(0x1a0a00, 0x1a0a00, 0x2d1500, 0x2d1500, 1);
-    g.fillRect(0, 0, W, H);
+    // ── Base room ──────────────────────────────────────────────────────────────
 
-    // Window (top center-right) — shows night outside
-    g.fillStyle(0x08082a, 1);
-    g.fillRect(W * 0.55, 30, 140, 100);
-    g.fillGradientStyle(0x02020e, 0x04041a, 0x07071c, 0x07071c, 1);
-    g.fillRect(W * 0.55 + 4, 34, 132, 92);
-    // Window stars
-    [[0.57,0.1],[0.61,0.05],[0.66,0.14],[0.71,0.08],[0.76,0.13],[0.8,0.06],[0.84,0.11]].forEach(([x,y]) => {
-      g.fillStyle(0xffffff, 0.7 + Math.random() * 0.3);
-      g.fillCircle(W * x, H * y, 1);
-    });
-    // Window frame
-    g.lineStyle(3, 0x3a1800, 1);
-    g.strokeRect(W * 0.55, 30, 140, 100);
-    // Cross frame
-    g.lineBetween(W * 0.55 + 70, 30, W * 0.55 + 70, 130);
-    g.lineBetween(W * 0.55, 80, W * 0.55 + 140, 80);
+    // Back wall — warm ochre plaster, lighter in the center under the lamp
+    g.fillGradientStyle(0x1e0e02, 0x1e0e02, 0x3a1e08, 0x3a1e08, 1);
+    g.fillRect(0, 0, W, H * 0.82);
 
-    // Left wall (darker)
-    g.fillStyle(0x150800, 1);
-    g.fillRect(0, 0, 90, H * 0.82);
+    // Ceiling — slightly cooler, dark
+    g.fillStyle(0x120800, 1);
+    g.fillRect(0, 0, W, H * 0.07);
 
-    // Right wall
-    g.fillStyle(0x180a00, 1);
-    g.fillRect(W - 80, 0, 80, H * 0.82);
+    // Left side wall panel (perspective edge, darker)
+    g.fillGradientStyle(0x0e0600, 0x1e0e02, 0x120800, 0x3a1e08, 1);
+    g.fillRect(0, 0, W * 0.11, H * 0.82);
 
-    // Wallpaper stripes (subtle)
-    g.lineStyle(1, 0x2a1200, 0.4);
-    for (let x = 90; x < W - 80; x += 28) g.lineBetween(x, 0, x, H * 0.82);
+    // Right side wall panel
+    g.fillGradientStyle(0x1e0e02, 0x0e0600, 0x3a1e08, 0x120800, 1);
+    g.fillRect(W * 0.89, 0, W * 0.11, H * 0.82);
 
-    // Floor
-    g.fillStyle(0x2a1200, 1);
+    // Subtle wallpaper texture — faint vertical stripes
+    g.lineStyle(1, 0x2e1608, 0.25);
+    for (let x = W * 0.11; x < W * 0.89; x += 22) g.lineBetween(x, 0, x, H * 0.82);
+
+    // Crown molding at ceiling
+    g.fillStyle(0x2a1408, 1);
+    g.fillRect(0, H * 0.07, W, 8);
+    g.lineStyle(1, 0x4a2810, 1);
+    g.lineBetween(0, H * 0.07 + 8, W, H * 0.07 + 8);
+
+    // ── Floor ──────────────────────────────────────────────────────────────────
+
+    g.fillGradientStyle(0x3a1e06, 0x3a1e06, 0x2a1404, 0x2a1404, 1);
     g.fillRect(0, H * 0.78, W, H * 0.22);
-    // Floor planks
-    g.lineStyle(1, 0x200e00, 0.6);
-    for (let x = 0; x < W; x += 60) g.lineBetween(x, H * 0.78, x, H);
 
-    // Ceiling border
-    g.fillStyle(0x0d0600, 1);
-    g.fillRect(0, 0, W, 12);
+    // Floor planks — vertical grain lines
+    g.lineStyle(1, 0x2a1204, 0.7);
+    for (let x = 0; x < W; x += 52) g.lineBetween(x, H * 0.78, x, H);
 
-    // Warm ambient light from a lamp (top-left corner glow)
-    g.fillStyle(0xff8800, 0.06);
-    g.fillCircle(60, 60, 120);
+    // Floor planks — horizontal joints
+    g.lineStyle(1, 0x301604, 0.35);
+    for (let y = H * 0.80; y < H; y += 18) g.lineBetween(0, y, W, y);
+
+    // Baseboard
+    g.fillStyle(0x200e02, 1);
+    g.fillRect(0, H * 0.78, W, 7);
+    g.lineStyle(1, 0x3a1e08, 0.8);
+    g.lineBetween(0, H * 0.785, W, H * 0.785);
+
+    // ── Window (left-center) ────────────────────────────────────────────────────
+
+    const wX = W * 0.14, wY = H * 0.09, wW = 148, wH = 126;
+
+    // Deep window reveal
+    g.fillStyle(0x080400, 1);
+    g.fillRect(wX - 8, wY - 6, wW + 16, wH + 12);
+
+    // Night sky — deep blue gradient
+    g.fillGradientStyle(0x01030f, 0x01030f, 0x03061e, 0x03061e, 1);
+    g.fillRect(wX, wY, wW, wH);
+
+    // Stars
+    [[0.16,0.10],[0.20,0.04],[0.25,0.15],[0.29,0.07],[0.34,0.13],[0.38,0.05],[0.22,0.20],
+     [0.32,0.20],[0.36,0.20],[0.18,0.17],[0.28,0.17]].forEach(([xp, yp]) => {
+      g.fillStyle(0xffffff, 0.5 + (xp * 7 % 5) * 0.1);
+      g.fillCircle(W * xp, H * yp, 1);
+    });
+
+    // Moon — top-right of window, soft glow
+    const mX = wX + wW * 0.78, mY = wY + wH * 0.28;
+    g.fillStyle(0xfff8d0, 0.12); g.fillCircle(mX, mY, 28);
+    g.fillStyle(0xfff8d0, 0.20); g.fillCircle(mX, mY, 20);
+    g.fillStyle(0xfff8d0, 0.90); g.fillCircle(mX, mY, 13);
+    // Moon crater shadows
+    g.fillStyle(0xdde8c0, 0.30); g.fillCircle(mX + 4, mY - 3, 4);
+    g.fillStyle(0xdde8c0, 0.25); g.fillCircle(mX - 4, mY + 5, 3);
+
+    // Window frame — thick wooden
+    g.lineStyle(5, 0x2e1608, 1);
+    g.strokeRect(wX, wY, wW, wH);
+    // Mullions
+    g.lineStyle(3, 0x2e1608, 1);
+    g.lineBetween(wX + wW / 2, wY, wX + wW / 2, wY + wH);
+    g.lineBetween(wX, wY + wH * 0.48, wX + wW, wY + wH * 0.48);
+
+    // Curtain rod
+    g.lineStyle(3, 0x4a2010, 1);
+    g.lineBetween(wX - 20, wY - 8, wX + wW + 20, wY - 8);
+    // Rod finials
+    g.fillStyle(0x6a3018, 1);
+    g.fillCircle(wX - 20, wY - 8, 4);
+    g.fillCircle(wX + wW + 20, wY - 8, 4);
+
+    // Curtains — drawn to sides, thick velvet look
+    g.fillStyle(0x5a1a08, 0.95);
+    g.fillTriangle(wX - 8, wY - 10, wX + 38, wY - 10, wX - 8, wY + wH + 10);
+    g.fillStyle(0x3e1006, 0.6);
+    g.fillTriangle(wX - 8, wY - 10, wX + 22, wY - 10, wX - 8, wY + wH + 10);
+
+    g.fillStyle(0x5a1a08, 0.95);
+    g.fillTriangle(wX + wW + 8, wY - 10, wX + wW - 34, wY - 10, wX + wW + 8, wY + wH + 10);
+    g.fillStyle(0x3e1006, 0.6);
+    g.fillTriangle(wX + wW + 8, wY - 10, wX + wW - 18, wY - 10, wX + wW + 8, wY + wH + 10);
+
+    // Moonlight beam through window onto floor
+    g.fillStyle(0xc8d8ff, 0.03);
+    g.fillTriangle(wX + 20, wY + wH, wX + wW - 20, wY + wH, W * 0.5, H * 0.82);
+
+    // ── Bulletin board (right wall) ─────────────────────────────────────────────
+
+    const bX = W * 0.70, bY = H * 0.10, bW = 160, bH = 120;
+
+    // Board frame — dark cork
+    g.fillStyle(0x1e0e02, 1);
+    g.fillRect(bX - 5, bY - 5, bW + 10, bH + 10);
+    g.fillStyle(0x6a3e18, 1);
+    g.fillRect(bX, bY, bW, bH);
+    // Cork texture dots
+    g.fillStyle(0x5a3210, 0.4);
+    for (let i = 0; i < 30; i++) {
+      const tx = bX + (i * 37 % bW);
+      const ty = bY + (i * 29 % bH);
+      g.fillCircle(tx, ty, 2);
+    }
+
+    // Notes pinned to board
+    const notes = [
+      [bX + 8,  bY + 8,  55, 32, 0xfffde0],
+      [bX + 68, bY + 6,  50, 28, 0xe8ffe8],
+      [bX + 118,bY + 10, 36, 30, 0xffe8e8],
+      [bX + 6,  bY + 46, 44, 34, 0xe8f4ff],
+      [bX + 55, bY + 42, 58, 36, 0xfffff0],
+      [bX + 116,bY + 48, 38, 28, 0xffe8f8],
+      [bX + 10, bY + 84, 50, 28, 0xfffde0],
+      [bX + 70, bY + 82, 42, 30, 0xe8ffe8],
+      [bX + 118,bY + 82, 36, 30, 0xffe8e8],
+    ];
+    notes.forEach(([nx, ny, nw, nh, nc]) => {
+      // Note shadow
+      g.fillStyle(0x000000, 0.15);
+      g.fillRect(nx + 2, ny + 2, nw, nh);
+      // Note
+      g.fillStyle(nc, 0.92);
+      g.fillRect(nx, ny, nw, nh);
+      // Pin
+      g.fillStyle(0xff3030, 1);
+      g.fillCircle(nx + nw / 2, ny + 3, 2.5);
+    });
+
+    // Red conspiracy strings connecting notes
+    g.lineStyle(1, 0xee2020, 0.65);
+    g.lineBetween(bX + 35, bY + 24, bX + 84, bY + 60);
+    g.lineBetween(bX + 84, bY + 60, bX + 136, bY + 26);
+    g.lineBetween(bX + 136, bY + 26, bX + 130, bY + 62);
+    g.lineBetween(bX + 84, bY + 60, bX + 50, bY + 98);
+    g.lineBetween(bX + 50, bY + 98, bX + 91, bY + 97);
+
+    // Board label — "PORTO COSMO — CASO ALIENI"
+    g.lineStyle(1, 0x2a1200, 1);
+    g.lineBetween(bX, bY + bH + 5, bX + bW, bY + bH + 5);
+
+    // ── Bookshelf (left wall area) ──────────────────────────────────────────────
+
+    const shX = W * 0.0, shY = H * 0.18, shW = W * 0.11, shH = H * 0.52;
+
+    // Back panel
+    g.fillStyle(0x180c02, 1);
+    g.fillRect(shX, shY, shW, shH);
+    // Shelf boards (3 shelves)
+    const shelfRows = 3;
+    const rowH = shH / shelfRows;
+    for (let s = 0; s <= shelfRows; s++) {
+      g.fillStyle(0x2a1408, 1);
+      g.fillRect(shX, shY + rowH * s - 3, shW, 5);
+    }
+    // Books — packed together with varied colors and widths
+    const bkColors = [0x8b1a1a, 0x1a3d8b, 0x1a7a2a, 0x8b7a1a, 0x5a1a7a, 0x8b4010, 0x106a8b, 0x7a1a3a, 0x2a6a2a];
+    for (let row = 0; row < shelfRows; row++) {
+      let bkX = shX + 2;
+      const bkY = shY + rowH * row + 5;
+      const bkH = rowH - 10;
+      let seed = row * 17;
+      while (bkX < shX + shW - 4) {
+        seed = (seed * 1664525 + 1013904223) & 0xffff;
+        const bkW = 6 + (seed % 6);
+        const color = bkColors[seed % bkColors.length];
+        g.fillStyle(color, 0.9);
+        g.fillRect(bkX, bkY + (seed % 4), bkW - 1, bkH - (seed % 4));
+        // Spine highlight
+        g.fillStyle(0xffffff, 0.07);
+        g.fillRect(bkX, bkY + (seed % 4), 1, bkH - (seed % 4));
+        bkX += bkW;
+      }
+    }
+
+    // ── Ceiling lamp ────────────────────────────────────────────────────────────
+
+    const lX = W * 0.50, lY = H * 0.07;
+
+    // Cord
+    g.lineStyle(2, 0x1a0a00, 1);
+    g.lineBetween(lX, 0, lX, lY + 4);
+
+    // Shade — truncated cone shape
+    g.fillStyle(0x5a2e0a, 1);
+    g.fillTriangle(lX - 28, lY + 26, lX + 28, lY + 26, lX, lY + 4);
+    g.fillStyle(0x3a1e06, 1);
+    g.fillRect(lX - 22, lY + 22, 44, 6);
+    // Shade rim highlight
+    g.lineStyle(1, 0x7a4a18, 0.8);
+    g.lineBetween(lX - 22, lY + 22, lX + 22, lY + 22);
+    // Bulb glow
+    g.fillStyle(0xffee88, 0.9);
+    g.fillCircle(lX, lY + 20, 4);
+
+    // Wide cone of warm lamplight
+    g.fillStyle(0xffaa22, 0.035);
+    g.fillTriangle(lX - 20, lY + 28, lX - W * 0.55, H * 0.82, lX + W * 0.55, H * 0.82);
+    // Brighter inner cone
+    g.fillStyle(0xffcc44, 0.04);
+    g.fillTriangle(lX - 10, lY + 28, lX - W * 0.28, H * 0.82, lX + W * 0.28, H * 0.82);
+    // Soft halo on ceiling around lamp
+    g.fillStyle(0xffaa22, 0.07);
+    g.fillEllipse(lX, lY + 10, 120, 30);
+
+    // ── Atmospheric lighting passes ─────────────────────────────────────────────
+
+    // Central warm glow (lamp pool on back wall)
+    g.fillStyle(0xff8800, 0.04);
+    g.fillEllipse(lX, H * 0.45, 500, 360);
+
+    // Computer screen blue glow (right area, where scrivania object will be)
+    g.fillStyle(0x2244cc, 0.06);
+    g.fillEllipse(W * 0.62, H * 0.52, 200, 160);
+
+    // Corner vignettes — darken edges for depth
+    g.fillGradientStyle(0x000000, 0x00000000, 0x000000, 0x00000000, 0.45);
+    g.fillRect(0, 0, W * 0.12, H);
+    g.fillGradientStyle(0x00000000, 0x000000, 0x00000000, 0x000000, 0.45);
+    g.fillRect(W * 0.88, 0, W * 0.12, H);
+    g.fillGradientStyle(0x000000, 0x000000, 0x00000000, 0x00000000, 0.3);
+    g.fillRect(0, 0, W, H * 0.08);
   }
 
   // ─────────────────────────────────────────── STRADA ────────────────────────
