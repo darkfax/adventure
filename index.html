@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KRAKEN JR. — Invasione dei Cervelli Cosmici</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="game">
+
+  <!-- TITLE SCREEN -->
+  <div id="titleScreen" class="screen">
+    <div class="title-ufo">🛸</div>
+    <div class="title-main">KRAKEN JR.</div>
+    <div class="title-sub">Invasione dei Cervelli Cosmici</div>
+    <div class="title-credits">Un'avventura di Marco Rossi, giornalista cosmico</div>
+    <button id="startBtn" class="pixel-btn blink">▶ INIZIA L'AVVENTURA</button>
+    <button id="loadBtn" class="pixel-btn small">↺ CONTINUA</button>
+  </div>
+
+  <!-- GAME SCREEN -->
+  <div id="gameScreen" class="screen hidden">
+
+    <!-- Scene area (top ~62%) -->
+    <div id="sceneArea">
+      <div id="sceneBg"></div>
+      <div id="sceneDecor"></div>
+      <div id="sceneObjects"></div>
+      <div id="character">🕵️</div>
+      <div id="sceneLabel"></div>
+
+      <!-- Dialogue overlay -->
+      <div id="dialogueBox" class="hidden">
+        <div id="dlgSpeaker"></div>
+        <div id="dlgText"></div>
+        <div id="dlgOptions"></div>
+      </div>
+    </div>
+
+    <!-- Message bar -->
+    <div id="msgBar">
+      <span id="verbLabel">Cammina verso</span><span id="msgText"></span>
+    </div>
+
+    <!-- Bottom panel: verbs left, inventory right -->
+    <div id="bottomPanel">
+      <div id="verbPanel"></div>
+      <div id="invPanel"></div>
+    </div>
+
+  </div>
+
+  <!-- END SCREEN -->
+  <div id="endScreen" class="screen hidden">
+    <div class="end-emoji">🎉</div>
+    <div class="end-title">VITTORIA COSMICA!</div>
+    <div class="end-body">
+      Marco Rossi ha salvato Porto Cosmo.<br>
+      Il trasmettitore è distrutto.<br>
+      Plok se n'è andato (con l'accordo sulla pizza).<br>
+      <br>
+      Il Gazzettino Cosmico ha finalmente uno scoop vero.
+    </div>
+    <button id="restartBtn" class="pixel-btn">↺ RICOMINCIA</button>
+  </div>
+
+</div>
+<!--
+  type="module" enables ES module syntax (import/export) in the browser.
+  The browser will automatically load engine.js, state.js, and data.js
+  as dependencies of main.js — no need to list them here.
+
+  IMPORTANT: modules require a web server (not file://).
+  Run from the project folder:  python3 -m http.server 8000
+  Then open:                    http://localhost:8000
+-->
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
