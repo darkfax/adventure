@@ -392,20 +392,20 @@ export const SCENES = {
     objects: [
       {
         id: 'letto', emoji: '🛏️', label: 'Letto di Marco',
-        x: 20, y: 74, size: 44,
+        x: 20, y: 74, size: 78,
         look: 'Il letto sfatto di Marco. Sul cuscino c\'è una statuetta di Zak McKracken, l\'unico eroe in cui crede.',
         pick: null, use: null, open: null,
       },
       {
         id: 'scrivania', emoji: '🖥️', label: 'Scrivania',
-        x: 57, y: 60, size: 42,
+        x: 57, y: 60, size: 54,
         look: 'La scrivania sommersa di articoli non pubblicati. In cima alla pila: '
             + '"ALIENI IN PIZZERIA? — La mia ricerca esclusiva". Sembrava pazzesco. Ora meno.',
         pick: null, use: null, open: null,
       },
       {
         id: 'giornale', emoji: '📰', label: 'Gazzettino Cosmico',
-        x: 70, y: 60, size: 26,
+        x: 70, y: 60, size: 22,
         look: 'Il giornale di stamattina. La sua storia di prima pagina: "STRANE LUCI A PORTO COSMO."',
         pick:  { item: 'giornale', msg: 'Marco raccoglie il giornale. "Forse questa volta ho ragione davvero."' },
         use:   null,
@@ -413,7 +413,7 @@ export const SCENES = {
       },
       {
         id: 'stagnola', emoji: '🫙', label: 'Rotolo di Stagnola',
-        x: 34, y: 74, size: 24,
+        x: 34, y: 74, size: 22,
         look: 'Carta stagnola. Buona per gli avanzi, migliore per i cappelli anti-controllo mentale.',
         pick:  { item: 'stagnola', msg: 'Marco prende la stagnola. "Non si sa mai."' },
         use:   null,
@@ -449,7 +449,7 @@ export const SCENES = {
     objects: [
       {
         id: 'chiavi', emoji: '🗝️', label: 'Mazzo di Chiavi',
-        x: 42, y: 72, size: 22,
+        x: 42, y: 72, size: 18,
         look: 'Un mazzo di chiavi sul marciapiede. Sul portachiavi: una pizzetta sorridente '
             + 'con occhi a spirale ipnotica. Appartengono alla pizzeria Da Cosmo.',
         pick:  { item: 'chiavi', msg: 'Marco raccoglie le chiavi. "Qualcuno le ha perse qui sul marciapiede. Strano."' },
@@ -458,14 +458,14 @@ export const SCENES = {
       },
       {
         id: 'lampione', emoji: '🪔', label: 'Lampione',
-        x: 72, y: 30, size: 38,
+        x: 72, y: 62, size: 72,
         look: 'Un lampione sfarfallante. Qualcuno ha inciso sulla base: '
             + '"CHI HA MANGIATO LA MIA PIZZA — L\'Alieno Arrabbiato". Normale.',
         pick: null, use: null, open: null,
       },
       {
         id: 'cassetta', emoji: '📬', label: 'Cassetta Postale',
-        x: 14, y: 55, size: 28,
+        x: 14, y: 55, size: 36,
         look: 'Cassetta piena di volantini: "DA COSMO — Pizza con Controllo Mentale Gratuito '
             + '(finché i diritti umani lo consentono)". Porto Cosmo è nei guai.',
         pick: null, use: null, open: null,
@@ -505,14 +505,14 @@ export const SCENES = {
     objects: [
       {
         id: 'manifesto', emoji: '📜', label: 'Manifesto Elettorale',
-        x: 12, y: 44, size: 30,
+        x: 12, y: 44, size: 36,
         look: 'Manifesto di Berlucci. I suoi occhi sono stati ritoccati con pupille a spirale. '
             + 'Sotto: "MANGIA PIZZA — PENSA MENO — VOTA BERLUCCI". Questo non è marketing normale.',
         pick: null, use: null, open: null,
       },
       {
         id: 'fontana', emoji: '⛲', label: 'Fontana del Comune',
-        x: 45, y: 40, size: 40,
+        x: 45, y: 48, size: 60,
         look: 'La fontana del municipio. L\'acqua emette un lieve bagliore bluastro. '
             + 'Sicuramente una questione di alghe.',
         use:  'Marco avvicina la mano all\'acqua. La ritira subito: per un attimo sente '
@@ -554,21 +554,21 @@ export const SCENES = {
     objects: [
       {
         id: 'menu', emoji: '📋', label: 'Menu',
-        x: 14, y: 56, size: 26,
+        x: 14, y: 56, size: 24,
         look: 'Menu di Da Cosmo. Le pizze si chiamano "Cosmica Special", "Invasione Margherita", '
             + '"Controllo Mentale con Funghi" e "Grande Fratello Salamino". Probabilmente ironia.',
         pick: null, use: null, open: null,
       },
       {
         id: 'forno', emoji: '🔥', label: 'Forno della Pizzeria',
-        x: 58, y: 36, size: 42,
+        x: 58, y: 44, size: 54,
         look: 'Un forno che emette luce BLU invece che arancione. '
             + '"Solo una resistenza difettosa", direbbe un ingenuo. Marco non è ingenuo (di solito).',
         pick: null, use: null, open: null,
       },
       {
         id: 'porta_retro', emoji: '🚪', label: 'Porta Retrobottega',
-        x: 80, y: 42, size: 34,
+        x: 80, y: 56, size: 68,
         look: 'Porta chiusa a chiave. C\'è scritto "VIETATO L\'ACCESSO — UMANI". '
             + 'Poi qualcuno ha corretto l\'ultima parola con "PERSONALE".',
         // lookWhen overrides the default look text when the flag is set
@@ -617,7 +617,7 @@ export const SCENES = {
     objects: [
       {
         id: 'schema', emoji: '📋', label: 'Schema Tecnico',
-        x: 18, y: 52, size: 26,
+        x: 18, y: 52, size: 22,
         look: 'Schema alieno. Lingua incomprensibile, ma i disegni sono chiari: '
             + 'PORTO COSMO, ANTENNA, TETTO, FRECCE VERSO I CERVELLI. '
             + 'A margine, scritto in italiano: "Scala sul retro — F."',
@@ -627,7 +627,7 @@ export const SCENES = {
       },
       {
         id: 'martello', emoji: '🔨', label: 'Martello',
-        x: 65, y: 64, size: 24,
+        x: 65, y: 64, size: 22,
         look: 'Un martello robusto. Ottimo per riparare cose. O per distruggerle. Marco pensa alla seconda opzione.',
         pick:  { item: 'martello', msg: 'Marco prende il martello. Sente già la colonna sonora della scena finale.' },
         use:   null,
@@ -635,7 +635,7 @@ export const SCENES = {
       },
       {
         id: 'dispositivo', emoji: '🛸', label: 'Dispositivo Misterioso',
-        x: 44, y: 32, size: 44,
+        x: 44, y: 40, size: 60,
         look: 'Un macchinario alieno che ronza e pulsa di verde. '
             + 'Sul pannello: "TRASMETTITORE AUSILIARIO — BACKUP". '
             + 'Questo è il backup. Quello principale è sul tetto.',
@@ -670,7 +670,7 @@ export const SCENES = {
     objects: [
       {
         id: 'trasmettitore', emoji: '📡', label: 'Trasmettitore Alieno',
-        x: 42, y: 18, size: 54,
+        x: 42, y: 42, size: 72,
         look: 'L\'antenna aliena. Pulsa di luce blu intensa. Anche con il cappello '
             + 'Marco sente il segnale: "MANGIA PIZZA... MANGIA PIZZA..." '
             + 'Deve distruggerla subito.',
@@ -685,7 +685,7 @@ export const SCENES = {
       },
       {
         id: 'parapetto', emoji: '🏙️', label: 'Il Panorama di Porto Cosmo',
-        x: 10, y: 25, size: 36,
+        x: 12, y: 40, size: 44,
         look: 'Porto Cosmo di notte, dall\'alto. Le strade sono vuote. '
             + 'Da qualche finestra si vede la luce blu dei televisori accesi sullo stesso canale. '
             + 'Poi si sente: "PIZZA... PIZZA..." Marco stringe il martello.',
